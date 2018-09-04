@@ -43,7 +43,6 @@ class Update:
                 self.my_cursor.execute(self.sql, self.val)
                 self.conn.commit()
             else:
-                print('hui')
                 send_message(self.chat_id, 'уже зарегався пидор!')
                 self.not_found = True
 

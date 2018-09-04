@@ -44,8 +44,8 @@ def main():
         print('Nothing to do!')
         return
 
-    # for update in updates:
-        # update.parseTextField()
+    for update in updates:
+        update.parseTextField()
 
 if __name__ == '__main__':
     main()
