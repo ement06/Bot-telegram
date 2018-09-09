@@ -28,15 +28,7 @@ def get_updates(offset=0):
             "first_name": update['message']['from']['first_name'],
             "last_name": update['message']['from']['last_name']
             }))
-            print(updates)
         return updates
-
-def send_sticker(chat_id, sticker_id):
-    url = URL + 'sendsticker?chat_id={}&sticker={}'.format(chat_id, sticker_id)
-    requests.get(url)
-
-def select_stikers():
-    pass
 
 def main():
     updates = get_updates()
