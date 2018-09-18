@@ -15,10 +15,12 @@ class Update:
         self.last_name = data.get("last_name", None)
 
     def select_pidor(self, chat_id):
-        my_cursor.execute('SELECT id, count FROM user_chat WHERE chat_id = {}'.format(self.chat_id))
+        my_cursor.execute('SELECT id, count FROM user_chat\
+        WHERE chat_id = {}'.format(self.chat_id))
         result = random.choice(my_cursor.fetchall())
 
-        my_cursor.execute('SELECT first_name, last_name FROM users WHERE id = {}'.format(result[0]))
+        my_cursor.execute('SELECT first_name, last_name FROM users\
+        WHERE id = {}'.format(result[0]))
         pidor = my_cursor.fetchall()
         send_message(self.chat_id,  '{} - {} раз(а)'.format(' '.join(pidor[0]), result[1] + 1))
         sql = "UPDATE user_chat SET count = %s WHERE id = %s AND chat_id = %s"
@@ -49,7 +51,8 @@ class Update:
             if x1[0] == self.check[1]:
                 break
         else:
-            my_cursor.execute("INSERT INTO chats (chat_id)VALUES ({})".format(self.chat_id))
+            my_cursor.execute("INSERT INTO chats (chat_id)\
+            VALUES ({})".format(self.chat_id))
             conn.commit()
         # checing and writind into user_chat table
         my_cursor.execute('SELECT id, chat_id FROM user_chat;')
@@ -58,8 +61,21 @@ class Update:
                 send_message(self.chat_id, 'уже зарегався, пидор!')
                 break
         else:
-            my_cursor.execute('INSERT INTO user_chat(id, chat_id) VALUES({}, {})'.format(self.user_id, self.chat_id))
+            my_cursor.execute('INSERT INTO user_chat(id, chat_id)\
+            VALUES({}, {})'.format(self.user_id, self.chat_id))
             conn.commit()
+
+    def top_10_pidars(self, chat_id):
+        my_cursor.execute('SELECT first_name, last_name, count \
+        FROM users LEFT JOIN user_chat ON users.id = user_chat.id \
+        WHERE user_chat.chat_id = {} ORDER BY user_chat.count \
+        desc limit 10;'.format(chat_id))
+        values_id_and_count = my_cursor.fetchall()
+        res = 'Топ-10 пидаров за текущий месяц: \n\n'
+        for index in range(len(values_id_and_count)):
+            current_string = ' '.join(str(x) for x in values_id_and_count[index])
+            res += '{}. '.format(index+1) + current_string + ' - раз(а)' + '\n'
+        send_message(self.chat_id, res)
 
     def parseTextField(self):
         if self.text == '/start@local_pidar_bot':
@@ -67,6 +83,7 @@ class Update:
         if self.text == '/action@local_pidar_bot':
             self.select_pidor(self.chat_id)
             self.select_stiker(self.chat_id)
-
+        if self.text == '/top@local_pidar_bot':
+            self.top_10_pidars(self.chat_id)
         with open(CURRENT_OFFSET_FILE, 'w') as f:
             f.write(str(self.update_id + 1))
