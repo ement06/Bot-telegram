@@ -6,6 +6,7 @@ import mysql.connector
 import random
 from trash import CURRENT_OFFSET_FILE, URL
 from update import Update
+from cron import Cron
 
 def get_updates(offset=0):
     if os.path.exists(CURRENT_OFFSET_FILE) and os.path.isfile(CURRENT_OFFSET_FILE):
@@ -32,12 +33,10 @@ def get_updates(offset=0):
 
 def main():
     updates = get_updates()
-    if not updates:
-        print('Nothing to do!')
-        return
-
     for update in updates:
         update.parseTextField()
 
+    Cron().start()
+    
 if __name__ == '__main__':
     main()

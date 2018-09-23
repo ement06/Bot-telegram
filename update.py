@@ -14,25 +14,6 @@ class Update:
         self.first_name = data.get("first_name", None)
         self.last_name = data.get("last_name", None)
 
-    def select_pidor(self, chat_id):
-        my_cursor.execute('SELECT id, count FROM user_chat\
-        WHERE chat_id = {}'.format(self.chat_id))
-        result = random.choice(my_cursor.fetchall())
-
-        my_cursor.execute('SELECT first_name, last_name FROM users\
-        WHERE id = {}'.format(result[0]))
-        pidor = my_cursor.fetchall()
-        send_message(self.chat_id,  '{} - {} раз(а)'.format(' '.join(pidor[0]), result[1] + 1))
-        sql = "UPDATE user_chat SET count = %s WHERE id = %s AND chat_id = %s"
-        val = (result[-1] + 1, result[0], self.chat_id)
-        my_cursor.execute(sql, val)
-        conn.commit()
-
-    def select_stiker(self, chat_id):
-        my_cursor.execute('SELECT * FROM stickers')
-        res = random.choice(my_cursor.fetchall())
-        send_sticker(self.chat_id, res[0])
-
     def writting_into_db(self, user_id, first_name, last_name, chat_id):
         self.check = (self.user_id, self.chat_id)
         # checing and writind into users table
@@ -80,9 +61,6 @@ class Update:
     def parseTextField(self):
         if self.text == '/start@local_pidar_bot':
             self.writting_into_db(self.user_id, self.first_name, self.last_name, self.chat_id)
-        if self.text == '/action@local_pidar_bot':
-            self.select_pidor(self.chat_id)
-            self.select_stiker(self.chat_id)
         if self.text == '/top@local_pidar_bot':
             self.top_10_pidars(self.chat_id)
         with open(CURRENT_OFFSET_FILE, 'w') as f:
